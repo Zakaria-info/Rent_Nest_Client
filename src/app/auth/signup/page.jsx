@@ -22,6 +22,7 @@ export default function SignupPage() {
     name: "",
     email: "",
     password: "",
+    role: "Tenant",
   });
 
   // State management for user experience alerts and load statuses
@@ -47,6 +48,7 @@ export default function SignupPage() {
         email: formData.email,
         password: formData.password,
         name: formData.name,
+        role: formData.role
       });
 
       if (response.error) {
@@ -176,6 +178,37 @@ export default function SignupPage() {
                 onChange={handleChange}
                 className="w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white focus:outline-none focus:border-zinc-700 placeholder:text-zinc-600 transition-colors"
               />
+            </div>
+          </div>
+
+          {/* Role Selection */}
+          <div className="flex flex-col gap-4">
+            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+              I want to join as
+            </label>
+            <div className="flex gap-3">
+              {["Tenant", "Owner", "Admin"].map((role) => (
+                <label
+                  key={role}
+                  className={`flex-1 cursor-pointer rounded-xl border p-4 text-center text-sm font-semibold transition ${
+                    formData.role === role
+                      ? "border-teal-500 bg-teal-50 text-teal-700"
+                      : "border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-700"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value={role}
+                    checked={formData.role === role}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, role: e.target.value }))
+                    }
+                    className="sr-only"
+                  />
+                  {role}
+                </label>
+              ))}
             </div>
           </div>
 

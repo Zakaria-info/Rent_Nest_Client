@@ -1,22 +1,25 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import NavbarClient from "./NavbarClient";
 
-const SESSION_COOKIE_MATCHERS = [
-  /^session$/,
-  /^rentnest-session$/,
-  /^rentnest\.session$/,
-  /^better-auth\./,
-  /^__Secure-better-auth\./,
-  /^authjs\./,
-  /^__Secure-authjs\./,
-];
-
 export default async function Navbar() {
-  const cookieStore = await cookies();
-  const isLoggedIn = hasSessionCookie(cookieStore);
+  const session = await auth.api.getSession({
+    headers: new Headers({
+      cookie: (await cookies()).toString(),
+    }),
+  });
 
-  return <NavbarClient isLoggedIn={isLoggedIn} logoutAction={logout} />;
+  const user = session?.user;
+
+  return (
+    <NavbarClient
+      isLoggedIn={!!user}
+      userName={user?.name}
+      userRole={user?.role}
+      logoutAction={logout}
+    />
+  );
 }
 
 async function logout() {
@@ -33,10 +36,15 @@ async function logout() {
   redirect("/auth/signin");
 }
 
-function hasSessionCookie(cookieStore) {
-  return cookieStore.getAll().some((cookie) => isSessionCookie(cookie.name));
-}
-
 function isSessionCookie(cookieName) {
+  const SESSION_COOKIE_MATCHERS = [
+    /^session$/,
+    /^rentnest-session$/,
+    /^rentnest\.session$/,
+    /^better-auth\./,
+    /^__Secure-better-auth\./,
+    /^authjs\./,
+    /^__Secure-authjs\./,
+  ];
   return SESSION_COOKIE_MATCHERS.some((matcher) => matcher.test(cookieName));
 }
