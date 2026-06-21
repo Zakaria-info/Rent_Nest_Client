@@ -30,7 +30,7 @@ async function logout() {
     }
   });
 
-  redirect("/login");
+  redirect("/auth/signin");
 }
 
 function hasSessionCookie(cookieStore) {

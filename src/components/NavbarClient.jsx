@@ -71,16 +71,16 @@ export default function NavbarClient({ isLoggedIn, logoutAction }) {
         <div className="hidden items-center gap-3 lg:flex">
           {isLoggedIn ? (
             <>
-              <Button
-                as={Link}
-                href="/dashboard"
-                radius="full"
-                variant="flat"
-                className="bg-teal-50 px-5 font-semibold text-teal-700"
-                startContent={<LayoutHeaderCellsLarge className="size-4" />}
-              >
-                Dashboard
-              </Button>
+              <Link href="/dashboard">
+                <Button
+                  radius="full"
+                  variant="flat"
+                  className="bg-teal-50 px-5 font-semibold text-teal-700"
+                  startContent={<LayoutHeaderCellsLarge className="size-4" />}
+                >
+                  Dashboard
+                </Button>
+              </Link>
               <form action={logoutAction}>
                 <Button
                   type="submit"
@@ -95,25 +95,25 @@ export default function NavbarClient({ isLoggedIn, logoutAction }) {
             </>
           ) : (
             <>
-              <Button
-                as={Link}
-                href="/login"
-                radius="full"
-                variant="light"
-                className="px-5 font-semibold text-slate-700"
-                startContent={<Person className="size-4" />}
-              >
-                Login
-              </Button>
-              <Button
-                as={Link}
-                href="/register"
-                radius="full"
-                className="bg-teal-600 px-6 font-semibold text-white shadow-lg shadow-teal-600/20"
-                startContent={<PersonPlus className="size-4" />}
-              >
-                Register
-              </Button>
+              <Link href="/auth/signin">
+                <Button
+                  radius="full"
+                  variant="light"
+                  className="px-5 font-semibold text-slate-700"
+                  startContent={<Person className="size-4" />}
+                >
+                  Login
+                </Button>
+              </Link>
+              <Link href="/auth/signup">
+                <Button
+                  radius="full"
+                  className="bg-teal-600 px-6 font-semibold text-white shadow-lg shadow-teal-600/20"
+                  startContent={<PersonPlus className="size-4" />}
+                >
+                  Register
+                </Button>
+              </Link>
             </>
           )}
         </div>
@@ -176,29 +176,29 @@ export default function NavbarClient({ isLoggedIn, logoutAction }) {
               </form>
             ) : (
               <>
-                <Button
-                  as={Link}
-                  href="/login"
-                  onPress={() => setIsMenuOpen(false)}
-                  fullWidth
-                  radius="lg"
-                  variant="flat"
-                  className="h-11 bg-slate-100 font-semibold text-slate-700"
-                  startContent={<Person className="size-4" />}
-                >
-                  Login
-                </Button>
-                <Button
-                  as={Link}
-                  href="/register"
-                  onPress={() => setIsMenuOpen(false)}
-                  fullWidth
-                  radius="lg"
-                  className="h-11 bg-teal-600 font-semibold text-white"
-                  startContent={<PersonPlus className="size-4" />}
-                >
-                  Register
-                </Button>
+                <Link href="/auth/signin">
+                  <Button
+                    onPress={() => setIsMenuOpen(false)}
+                    fullWidth
+                    radius="lg"
+                    variant="flat"
+                    className="h-11 bg-slate-100 font-semibold text-slate-700"
+                    startContent={<Person className="size-4" />}
+                  >
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/auth/signup">
+                  <Button
+                    onPress={() => setIsMenuOpen(false)}
+                    fullWidth
+                    radius="lg"
+                    className="h-11 bg-teal-600 font-semibold text-white"
+                    startContent={<PersonPlus className="size-4" />}
+                  >
+                    Register
+                  </Button>
+                </Link>
               </>
             )}
           </div>
