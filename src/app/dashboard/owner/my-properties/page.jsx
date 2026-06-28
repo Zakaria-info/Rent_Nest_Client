@@ -6,10 +6,11 @@ import {
   DashboardPageShell,
   StatusBadge,
 } from "@/components/dashboard/DashboardUI";
-import { ownerProperties } from "@/components/dashboard/dashboardData";
+import { getPropertiesByOwner } from "@/lib/data";
 
 export default async function MyPropertiesPage() {
-  await requireUser([ROLES.OWNER, ROLES.ADMIN]);
+  const user = await requireUser([ROLES.OWNER, ROLES.ADMIN]);
+  const properties = await getPropertiesByOwner(user.id);
 
   return (
     <DashboardPageShell
@@ -18,10 +19,10 @@ export default async function MyPropertiesPage() {
     >
       <DataTable
         columns={[
-          { key: "title", header: "Property Title" },
+          { key: "propertyTitle", header: "Property Title" },
           { key: "location", header: "Location" },
           { key: "propertyType", header: "Type" },
-          { key: "rent", header: "Rent" },
+          { key: "rentPrice", header: "Rent" },
           { key: "rentType", header: "Rent Type" },
           {
             key: "status",
@@ -39,7 +40,7 @@ export default async function MyPropertiesPage() {
             ),
           },
         ]}
-        rows={ownerProperties}
+        rows={properties}
       />
     </DashboardPageShell>
   );

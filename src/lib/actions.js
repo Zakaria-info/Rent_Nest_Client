@@ -10,8 +10,20 @@ export async function createNewRentPost(payload) {
         const propertiesCollection = db.collection('properties');
 
         const result = await propertiesCollection.insertOne({
-            ...payload,
-            price: parseFloat(payload.price),
+            propertyTitle: payload.propertyTitle,
+            description: payload.description,
+            location: payload.location,
+            propertyType: payload.propertyType,
+            rentPrice: payload.rentPrice,
+            rentType: payload.rentType,
+            bedrooms: payload.bedrooms,
+            bathrooms: payload.bathrooms,
+            propertySize: payload.propertySize,
+            amenities: payload.amenities,
+            images: payload.images,
+            extraFeatures: payload.extraFeatures,
+            owner: payload.owner,
+            status: payload.status,
             createdAt: new Date(),
         });
 
