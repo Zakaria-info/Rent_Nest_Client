@@ -5,9 +5,9 @@ import {
   FolderHouse,
   ListCheck,
   ChartColumn,
-  LayoutDashboard,
+  LayoutTabs,
   FilePlus,
-  Mail,
+  Envelope,
   Heart,
   Bars,
 } from '@gravity-ui/icons';
@@ -18,16 +18,18 @@ import Link from 'next/link';
 
 const navItems = {
   [ROLES.ADMIN]: [
+    { href: '/dashboard/admin', icon: LayoutTabs, label: 'Dashboard' },
     { href: '/dashboard/admin/users', icon: Person, label: 'All Users' },
     { href: '/dashboard/admin/properties', icon: FolderHouse, label: 'All Properties' },
     { href: '/dashboard/admin/bookings', icon: ListCheck, label: 'All Bookings' },
     { href: '/dashboard/admin/transactions', icon: ChartColumn, label: 'Transactions' },
+    { href: '/dashboard/owner/add-property', icon: FilePlus, label: 'Add Property' },
   ],
   [ROLES.OWNER]: [
-    { href: '/dashboard/owner', icon: LayoutDashboard, label: 'Dashboard' },
+    { href: '/dashboard/owner', icon: LayoutTabs, label: 'Dashboard' },
     { href: '/dashboard/owner/add-property', icon: FilePlus, label: 'Add Property' },
     { href: '/dashboard/owner/my-properties', icon: FolderHouse, label: 'My Properties' },
-    { href: '/dashboard/owner/booking-requests', icon: Mail, label: 'Booking Requests' },
+    { href: '/dashboard/owner/booking-requests', icon: Envelope, label: 'Booking Requests' },
     { href: '/dashboard/owner/profile', icon: Person, label: 'Profile' },
   ],
   [ROLES.TENANT]: [

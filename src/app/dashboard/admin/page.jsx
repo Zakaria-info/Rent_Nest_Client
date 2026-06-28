@@ -1,11 +1,17 @@
 import React from "react";
 import { requireUser } from "@/lib/session";
 import { ROLES } from "@/lib/role-access";
+import { DashboardPageShell } from "@/components/dashboard/DashboardUI";
 
-const RecruiterPage = async () => {
-  await requireUser([ROLES.OWNER, ROLES.ADMIN]);
+const AdminDashboardPage = async () => {
+  await requireUser([ROLES.ADMIN]);
 
-  return <div>Recruiter page</div>;
+  return (
+    <DashboardPageShell
+      title="Admin Dashboard"
+      description="This is the central hub for managing the entire platform. From here, you can oversee all users, properties, bookings, and financial transactions. Use the navigation to access different management sections."
+    />
+  );
 };
 
-export default RecruiterPage;
+export default AdminDashboardPage;
