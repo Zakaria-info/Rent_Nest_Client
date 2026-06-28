@@ -1,15 +1,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getCurrentSession } from "@/lib/session";
 import NavbarClient from "./NavbarClient";
 
 export default async function Navbar() {
-  const session = await auth.api.getSession({
-    headers: new Headers({
-      cookie: (await cookies()).toString(),
-    }),
-  });
-
+  const session = await getCurrentSession();
   const user = session?.user;
 
   return (

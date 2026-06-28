@@ -17,7 +17,7 @@ import {
 } from "@gravity-ui/icons";
 
 // Better Auth Client
-import {  authClient, signIn } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 
 export default function SigninPage() {
   const router = useRouter();
@@ -68,7 +68,8 @@ export default function SigninPage() {
       setIsLoading(false);
 
       setTimeout(() => {
-        router.push("/");
+        router.replace("/dashboard");
+        router.refresh();
       }, 1200);
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");

@@ -1,43 +1,19 @@
-import { auth } from "@/lib/auth";
-import { ROLES, hasRole } from "@/lib/role-access";
-
 /**
  * Role-based access control proxy
  * Protects routes based on user roles
  */
 
-export async function requireRole(request, allowedRoles, redirectTo = "/auth/signin") {
-  const session = await auth.api.getSession({
-    headers: new Headers({
-      cookie: request.headers.get("cookie") || "",
-    }),
-  });
-
-  const user = session?.user;
-
-  if (!user) {
-    return { authorized: false, user: null, redirectTo };
-  }
-
-  if (!hasRole(user.role, allowedRoles)) {
-    return { authorized: false, user, redirectTo: "/unauthorized" };
-  }
-
-  return { authorized: true, user, redirectTo: null };
+export function hasSessionCookie(request) {
+  return request.cookies.getAll().some((cookie) => isSessionCookie(cookie.name));
 }
 
-export function withRoleProtection(allowedRoles, handler) {
+export function withRoleProtection(_allowedRoles, handler) {
   return async (request, context) => {
-    const { authorized, user, redirectTo } = await requireRole(request, allowedRoles);
-
-    if (!authorized) {
-      if (redirectTo === "/unauthorized") {
-        return Response.redirect(new URL("/unauthorized", request.url));
-      }
-      return Response.redirect(new URL(redirectTo, request.url));
+    if (!hasSessionCookie(request)) {
+      return Response.redirect(new URL("/auth/signin", request.url));
     }
 
-    return handler(request, context, user);
+    return handler(request, context);
   };
 }
 
@@ -48,21 +24,13 @@ export function withRoleProtection(allowedRoles, handler) {
 export async function proxy(request) {
   const { pathname } = new URL(request.url);
 
-  // Define protected routes and their required roles
-  const protectedRoutes = {
-    "/dashboard": [ROLES.TENANT, ROLES.OWNER, ROLES.ADMIN],
-    "/properties": [ROLES.TENANT, ROLES.OWNER, ROLES.ADMIN],
-    "/owner": [ROLES.OWNER, ROLES.ADMIN],
-    "/admin": [ROLES.ADMIN],
-  };
+  const protectedRoutes = ["/dashboard", "/properties", "/owner", "/admin"];
 
   // Check if the current path matches any protected route
-  for (const [route, allowedRoles] of Object.entries(protectedRoutes)) {
+  for (const route of protectedRoutes) {
     if (pathname.startsWith(route)) {
-      const { authorized, redirectTo } = await requireRole(request, allowedRoles);
-
-      if (!authorized) {
-        return Response.redirect(new URL(redirectTo, request.url));
+      if (!hasSessionCookie(request)) {
+        return Response.redirect(new URL("/auth/signin", request.url));
       }
 
       return;
@@ -76,3 +44,17 @@ export async function proxy(request) {
 export const config = {
   matcher: ["/dashboard/:path*", "/properties/:path*", "/owner/:path*", "/admin/:path*"],
 };
+
+function isSessionCookie(cookieName) {
+  const SESSION_COOKIE_MATCHERS = [
+    /^session$/,
+    /^rentnest-session$/,
+    /^rentnest\.session$/,
+    /^better-auth\./,
+    /^__Secure-better-auth\./,
+    /^authjs\./,
+    /^__Secure-authjs\./,
+  ];
+
+  return SESSION_COOKIE_MATCHERS.some((matcher) => matcher.test(cookieName));
+}

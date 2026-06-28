@@ -1,25 +1,13 @@
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { ROLES, canAccessProperty } from "@/lib/role-access";
+import { requireUser } from "@/lib/session";
+import { ROLES, normalizeRole } from "@/lib/role-access";
 import Link from "next/link";
 import { Button } from "@heroui/react";
 import MapPin from "@gravity-ui/icons/MapPin";
 
 export default async function PropertiesPage() {
-  const session = await auth.api.getSession({
-    headers: new Headers({
-      cookie: "",
-    }),
-  });
-
-  const user = session?.user;
-
-  if (!user || !canAccessProperty(user.role)) {
-    redirect("/auth/signin");
-  }
-
-  const role = user.role || ROLES.TENANT;
-  const canManage = user.role === ROLES.OWNER || user.role === ROLES.ADMIN;
+  const user = await requireUser([ROLES.TENANT, ROLES.OWNER, ROLES.ADMIN]);
+  const role = normalizeRole(user.role);
+  const canManage = role === ROLES.OWNER || role === ROLES.ADMIN;
 
   return (
     <div className="min-h-screen bg-zinc-50 py-12 px-4">

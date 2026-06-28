@@ -1,89 +1,78 @@
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import { ROLES, canViewDashboard, canManageProperties, canManageUsers } from "@/lib/role-access";
 import Link from "next/link";
 import { Button } from "@heroui/react";
 import LayoutHeaderCellsLarge from "@gravity-ui/icons/LayoutHeaderCellsLarge";
 import MapPin from "@gravity-ui/icons/MapPin";
 import Person from "@gravity-ui/icons/Person";
+import { requireUser } from "@/lib/session";
+import { ROLES, normalizeRole } from "@/lib/role-access";
 
 export default async function DashboardPage() {
-  const session = await auth.api.getSession({
-    headers: new Headers({
-      cookie: "",
-    }),
-  });
-
-  const user = session?.user;
-
-  if (!user || !canViewDashboard(user.role)) {
-    redirect("/auth/signin");
-  }
-
-  const role = user.role || ROLES.TENANT;
+  const user = await requireUser([ROLES.TENANT, ROLES.OWNER, ROLES.ADMIN]);
+  const role = normalizeRole(user.role);
+  const canManageProperties = role === ROLES.OWNER || role === ROLES.ADMIN;
+  const canManageUsers = role === ROLES.ADMIN;
 
   return (
-    <div className="min-h-screen bg-zinc-50 py-12 px-4">
-      <div className="mx-auto max-w-7xl space-y-8">
-        <header className="space-y-2">
-          <h1 className="text-3xl font-bold text-slate-950">
-            Welcome, {user.name || "User"}!
-          </h1>
-          <p className="text-slate-600">
-            Your role: <span className="font-semibold text-teal-700">{role}</span>
-          </p>
+    <main className="min-h-screen bg-slate-50 px-4 py-10">
+      <section className="mx-auto flex max-w-7xl flex-col gap-8">
+        <header className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-teal-700">{role}</p>
+            <h1 className="mt-1 text-3xl font-bold tracking-normal text-slate-950">
+              Welcome, {user.name || "User"}
+            </h1>
+            <p className="mt-2 text-sm text-slate-600">
+              Manage your RentNest activity from one place.
+            </p>
+          </div>
+          <Link href="/properties">
+            <Button
+              className="bg-teal-600 font-semibold text-white"
+              startContent={<MapPin className="size-4" />}
+            >
+              View Properties
+            </Button>
+          </Link>
         </header>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <DashboardCard
-            title="My Properties"
-            description="View and manage your property listings"
-            href="/properties"
+        <div className="grid gap-4 md:grid-cols-3">
+          <DashboardPanel
             icon={MapPin}
-            roles={[ROLES.OWNER, ROLES.ADMIN]}
-            userRole={role}
+            title="Properties"
+            description={
+              canManageProperties
+                ? "Browse listings and manage property records."
+                : "Browse available rental listings."
+            }
           />
-
-          <DashboardCard
-            title="User Management"
-            description="Manage users and permissions"
-            href="/admin/users"
-            icon={Person}
-            roles={[ROLES.ADMIN]}
-            userRole={role}
-          />
-
-          <DashboardCard
-            title="Dashboard Overview"
-            description="View your dashboard statistics"
-            href="/dashboard/overview"
+          <DashboardPanel
             icon={LayoutHeaderCellsLarge}
-            roles={[ROLES.TENANT, ROLES.OWNER, ROLES.ADMIN]}
-            userRole={role}
+            title="Role Access"
+            description={`Your current permissions are based on the ${role} role.`}
+          />
+          <DashboardPanel
+            icon={Person}
+            title="Users"
+            description={
+              canManageUsers
+                ? "Admin access is enabled for user management."
+                : "User management is available to admins only."
+            }
           />
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 
-function DashboardCard({ title, description, href, icon: Icon, roles, userRole }) {
-  const hasAccess = roles.includes(userRole);
-
-  if (!hasAccess) {
-    return null;
-  }
-
+function DashboardPanel({ icon: Icon, title, description }) {
   return (
-    <Link
-      href={href}
-      className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-teal-200 hover:shadow-md"
-    >
-      <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
-        <Icon className="size-6" />
+    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="mb-4 grid size-11 place-items-center rounded-lg bg-teal-50 text-teal-700">
+        <Icon className="size-5" />
       </div>
-      <h3 className="mb-2 text-lg font-semibold text-slate-950">{title}</h3>
-      <p className="text-sm text-slate-600">{description}</p>
-    </Link>
+      <h2 className="text-base font-bold text-slate-950">{title}</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+    </article>
   );
 }

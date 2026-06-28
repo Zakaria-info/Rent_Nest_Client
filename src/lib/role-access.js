@@ -9,12 +9,23 @@ export const ROLES = {
   ADMIN: "Admin",
 };
 
+export const normalizeRole = (role) => {
+  const normalizedRole = String(role || ROLES.TENANT).toLowerCase();
+
+  if (normalizedRole === "owner") return ROLES.OWNER;
+  if (normalizedRole === "admin") return ROLES.ADMIN;
+
+  return ROLES.TENANT;
+};
+
 export const hasRole = (userRole, allowedRoles) => {
-  if (!userRole || !allowedRoles) return false;
+  if (!allowedRoles) return false;
+  const normalizedUserRole = normalizeRole(userRole);
+
   if (Array.isArray(allowedRoles)) {
-    return allowedRoles.includes(userRole);
+    return allowedRoles.map(normalizeRole).includes(normalizedUserRole);
   }
-  return userRole === allowedRoles;
+  return normalizedUserRole === normalizeRole(allowedRoles);
 };
 
 export const isTenant = (userRole) => hasRole(userRole, ROLES.TENANT);

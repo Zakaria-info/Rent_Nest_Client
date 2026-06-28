@@ -48,7 +48,7 @@ export default function SignupPage() {
         email: formData.email,
         password: formData.password,
         name: formData.name,
-        role: formData.role
+        role: formData.role,
       });
 
       if (response.error) {
@@ -59,8 +59,11 @@ export default function SignupPage() {
       } else {
         setIsLoading(false);
         setSuccess("Account created successfully! Redirecting...");
-        setFormData({ name: "", email: "", password: "" });
-        setTimeout(() => router.push("/auth/signin"), 1200);
+        setFormData({ name: "", email: "", password: "", role: "Tenant" });
+        setTimeout(() => {
+          router.replace("/dashboard");
+          router.refresh();
+        }, 1200);
       }
     } catch (err) {
       setIsLoading(false);
